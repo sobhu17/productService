@@ -14,7 +14,7 @@ public interface ProductService {
 
     public List<GenericProductDto> getAllProducts();
 
-    public GenericProductDto deleteProductById(UUID id);
+    public GenericProductDto deleteProductById(UUID id) throws NotFoundException;
 
-    public GenericProductDto updateProductById(UUID  id , GenericProductDto product);
+    public GenericProductDto updateProductById(UUID  id , GenericProductDto product) throws NotFoundException;
 }

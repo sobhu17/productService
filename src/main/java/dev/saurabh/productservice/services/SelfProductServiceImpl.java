@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Primary
@@ -28,11 +29,13 @@ public class SelfProductServiceImpl implements ProductService{
 
     @Override
     public GenericProductDto getProductById(UUID id) throws NotFoundException {
-        Product product = productRepository.findById(id).get();
+        Optional<Product> op = productRepository.findById(id);
 
-        if(product == null){
+        if(op.isEmpty() == true){
             throw new NotFoundException("Product with id " + id + " isn't available!!");
         }
+
+        Product product = op.get();
 
         GenericProductDto genericProductDto = convertToGenericProductDto(product);
         return genericProductDto;
@@ -60,8 +63,14 @@ public class SelfProductServiceImpl implements ProductService{
     }
 
     @Override
-    public GenericProductDto deleteProductById(UUID id) {
-        Product product = productRepository.findById(id).get();
+    public GenericProductDto deleteProductById(UUID id) throws NotFoundException {
+        Optional<Product> op = productRepository.findById(id);
+
+        if(op.isEmpty() == true){
+            throw new NotFoundException("Product with id " + id + " isn't available!!");
+        }
+
+        Product product = op.get();
         GenericProductDto genericProductDto = convertToGenericProductDto(product);
         productRepository.deleteById(id);
 
@@ -69,7 +78,13 @@ public class SelfProductServiceImpl implements ProductService{
     }
 
     @Override
-    public GenericProductDto updateProductById(UUID id, GenericProductDto genericProductDto) {
+    public GenericProductDto updateProductById(UUID id, GenericProductDto genericProductDto) throws NotFoundException {
+        Optional<Product> op = productRepository.findById(id);
+
+        if(op.isEmpty() == true){
+            throw new NotFoundException("Product with id " + id + " isn't available!!");
+        }
+
         Product product = convertToProductDto(genericProductDto);
         product.setId(id);
         productRepository.save(product);

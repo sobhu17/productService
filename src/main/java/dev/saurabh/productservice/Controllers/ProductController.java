@@ -35,7 +35,7 @@ public class ProductController {
 
 
     @DeleteMapping("{id}")
-    public ResponseEntity<GenericProductDto> deleteProductById(@PathVariable("id") UUID id) {
+    public ResponseEntity<GenericProductDto> deleteProductById(@PathVariable("id") UUID id) throws NotFoundException {
         return new ResponseEntity<>(productService.deleteProductById(id), HttpStatus.NOT_FOUND);
     }
 
@@ -45,7 +45,7 @@ public class ProductController {
     }
 
     @PutMapping("{id}")
-    public GenericProductDto updateProductById(@PathVariable("id") UUID id , @RequestBody GenericProductDto product){
+    public GenericProductDto updateProductById(@PathVariable("id") UUID id , @RequestBody GenericProductDto product) throws NotFoundException {
         return productService.updateProductById(id , product);
     }
 }
