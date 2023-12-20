@@ -3,7 +3,6 @@ package dev.saurabh.productservice.services;
 import dev.saurabh.productservice.dtos.GenericProductDto;
 import dev.saurabh.productservice.exceptions.NotFoundException;
 import dev.saurabh.productservice.models.Category;
-import dev.saurabh.productservice.models.CategoryType;
 import dev.saurabh.productservice.models.Product;
 import dev.saurabh.productservice.repository.CategoryRepository;
 import dev.saurabh.productservice.repository.ProductRepository;
@@ -85,9 +84,21 @@ public class SelfProductServiceImpl implements ProductService{
             throw new NotFoundException("Product with id " + id + " isn't available!!");
         }
 
-        Product product = convertToProductDto(genericProductDto);
+        Product product = op.get();
         product.setId(id);
+        product.setTitle(genericProductDto.getTitle());
+        product.setPrice(genericProductDto.getPrice());
+        product.setImage(genericProductDto.getImage());
+        product.setDescription(product.getDescription());
+
+        if(!product.getCategory().getName().equals(genericProductDto.getCategory())){
+            Category category = new Category();
+            category.setName(genericProductDto.getCategory());
+            product.setCategory(category);
+        }
+
         productRepository.save(product);
+
         return genericProductDto;
     }
 
