@@ -35,7 +35,7 @@ public class ProductController {
     }
 
     @GetMapping("{id}")
-    public GenericProductDto getProductById(@RequestHeader(HttpHeaders.AUTHORIZATION) String authToken , @PathVariable("id") UUID id) throws NotFoundException {
+    public GenericProductDto getProductById(@PathVariable("id") UUID id) throws NotFoundException {
         return productService.getProductById(id);
     }
 
