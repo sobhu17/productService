@@ -1,11 +1,13 @@
 package dev.saurabh.productservice.services;
 
 import dev.saurabh.productservice.dtos.GenericProductDto;
+import dev.saurabh.productservice.dtos.SortParameter;
 import dev.saurabh.productservice.models.Product;
 import dev.saurabh.productservice.repository.ProductRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,8 +23,27 @@ public class SearchService {
         this.productRepository = productRepository;
     }
 
-    public Page<GenericProductDto> searchProducts(String query , int pageNumber , int sizeOfEachPage){
-        Page<Product> productPage = productRepository.findAllByTitleContaining(query , PageRequest.of(pageNumber , sizeOfEachPage));
+    public Page<GenericProductDto> searchProducts(String query , int pageNumber , int sizeOfEachPage , List<SortParameter> sortByParameters){
+        Sort sort;
+
+        if(sortByParameters.get(0).getSortType().equals("ASC")){
+            sort = Sort.by(sortByParameters.get(0).getParameterName());
+        }
+        else{
+            sort = Sort.by(sortByParameters.get(0).getParameterName()).descending();
+        }
+
+        for(int i = 1 ; i < sortByParameters.size() ; i++){
+            if(sortByParameters.get(i).getSortType().equals("ASC")){
+                sort = sort.and(Sort.by(sortByParameters.get(i).getParameterName()));
+            }
+            else{
+                sort = sort.and(Sort.by(sortByParameters.get(i).getParameterName()).descending());
+            }
+        }
+
+        Page<Product> productPage = productRepository.findAllByTitleContaining(query , PageRequest.of(pageNumber , sizeOfEachPage , sort));
+
 
         List<Product> products = productPage.get().collect(Collectors.toList());
         List<GenericProductDto> genericProductDtos = new ArrayList<>();
