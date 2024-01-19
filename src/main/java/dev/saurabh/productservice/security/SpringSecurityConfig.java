@@ -13,13 +13,16 @@ public class SpringSecurityConfig {
             throws Exception {
         http
                 .authorizeHttpRequests((authorize) -> authorize
-                                .requestMatchers("/products/{id}").authenticated()
+//                                .requestMatchers("/products/{id}").authenticated()
                                 .anyRequest().permitAll()
                         //.anyRequest().authenticated()
                 )
                 // Form login handles the redirect to the login page from the
                 // authorization server filter chain
-                .formLogin(Customizer.withDefaults());
+                .formLogin(Customizer.withDefaults())
+                .cors().disable()
+                .csrf().disable()
+        ;
 
         return http.build();
     }
