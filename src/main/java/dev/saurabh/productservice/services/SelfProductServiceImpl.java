@@ -7,6 +7,7 @@ import dev.saurabh.productservice.models.Product;
 import dev.saurabh.productservice.repository.CategoryRepository;
 import dev.saurabh.productservice.repository.ProductRepository;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,14 +21,23 @@ public class SelfProductServiceImpl implements ProductService{
 
     private ProductRepository productRepository;
     private CategoryRepository categoryRepository;
+    private RedisTemplate<String , Object> redisTemplate;
 
-    public SelfProductServiceImpl(ProductRepository productRepository , CategoryRepository categoryRepository){
+    public SelfProductServiceImpl(ProductRepository productRepository , CategoryRepository categoryRepository , RedisTemplate<String  , Object> redisTemplate){
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
     public GenericProductDto getProductById(UUID id) throws NotFoundException {
+        GenericProductDto cacheGenericProductDto = (GenericProductDto) redisTemplate.opsForHash().get("PRODUCTS" , id);
+
+        if(cacheGenericProductDto != null){
+            System.out.println("Fetching From Cache!!!");
+            return cacheGenericProductDto;
+        }
+
         Optional<Product> op = productRepository.findById(id);
 
         if(op.isEmpty() == true){
@@ -37,6 +47,11 @@ public class SelfProductServiceImpl implements ProductService{
         Product product = op.get();
 
         GenericProductDto genericProductDto = convertToGenericProductDto(product);
+
+        redisTemplate.opsForHash().put("PRODUCTS" , id , genericProductDto);
+
+        System.out.println("Fetching from DB!!!");
+
         return genericProductDto;
     }
 
